@@ -2,6 +2,14 @@ import random
 
 class BlackjackEnviron:
     def __init__(self, start_bankroll = 100, num_decks=6, num_when_to_shuffle=75):
+        """
+        Initializes the Blackjack environment (creates deck, starts game).
+        
+        Args:
+            start_bankroll: Beginning amount of money/chips to work with.
+            num_decks: Number of decks to use in the shoe.
+            num_when_to_shuffle: Number of cards to deal before shuffling.
+        """
         self.num_decks = num_decks
         self.num_when_to_shuffle = num_when_to_shuffle
         self.deck = self.create_deck()
@@ -9,13 +17,18 @@ class BlackjackEnviron:
         self.dealer_hand = []
         self.bankroll = start_bankroll
         self.current_bet = 0
-        # can add splitting, doubling down, insurance later
-        self.actions = ['hit', 'stand'] 
+        self.actions = ['hit', 'stand'] # can add splitting, doubling down, insurance later
         self.game_over = False
         self.deck = self.create_deck()
         self.start_game()
 
     def place_bet(self, bet):
+        """
+        Places bet for the current round. Minimum bet is 1.
+        
+        Args:
+            bet: Bet amount to place.
+        """
         if bet < 1: # betting minimum of 1
             raise ValueError("Minimum bet is 1")
         if bet > self.bankroll:
@@ -24,6 +37,9 @@ class BlackjackEnviron:
         self.bankroll -= bet
 
     def create_deck(self):
+        """
+        Creates and shuffles a shoe of cards based on the number of decks of the Blackjack instance.
+        """
         suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
         ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
         shoe = [(rank, suit) for suit in suits for rank in ranks] * self.num_decks
@@ -31,20 +47,36 @@ class BlackjackEnviron:
         return shoe
 
     def needs_shuffle(self):
+        """
+        Checks if the deck needs to be shuffled based on the number of remaining cards,
+        and the threshold set for shuffling.
+        """
         return len(self.deck) <= self.num_when_to_shuffle
 
     def deal_card(self):
+        """
+        Picks the top card from the deck, shuffling if necessary.
+        Returns: a tuple representing the selected card (rank, suit).
+        """
         if self.needs_shuffle():
             self.deck = self.create_deck()
         return self.deck.pop()
 
     def start_game(self):
+        """
+        Starts a new round of Blackjack, dealing two cards each to player and dealer.
+        Returns: the initial state (player total, dealer upcard, usable ace).
+        """
         self.game_over = False
         self.player_hand = [self.deal_card(), self.deal_card()]
         self.dealer_hand = [self.deal_card(), self.deal_card()]
         return self._get_state()
 
     def _get_state(self):
+        """
+        Gets the current state of the game.
+        Returns: the current state as a tuple: (player total, dealer upcard value, usable ace).
+        """
         player_total, usable_ace = self.calculate_hand_value(self.player_hand)
 
         # Dealer upcard value
@@ -57,8 +89,15 @@ class BlackjackEnviron:
             dealer_upcard_value = int(dealer_upcard_rank)
         return (player_total, dealer_upcard_value, usable_ace)
 
-    # calculates hand value, accounting for aces
+    # 
     def calculate_hand_value(self, hand):
+        """
+        Calculates hand value, accounting for aces.
+        Adjusts ace value from 11 to 1 if busting.
+        Args: 
+            hand: list of tuples representing the hand (rank, suit).
+        Returns: total value of the hand, whether a usable ace is present.
+        """
         total = 0
         aces = 0
         for rank, _ in hand:
@@ -78,12 +117,19 @@ class BlackjackEnviron:
         return total, usable_ace
 
     def player_hit(self):
+        """
+        Player takes a hit (draws a card). Updates game over status if bust.
+        """
         if not self.game_over:
             self.player_hand.append(self.deal_card())
             if self.calculate_hand_value(self.player_hand)[0] > 21:
                 self.game_over = True
 
     def dealer_play(self):
+      """
+      Dealer plays according to standard rules: hits until reaching 17 or higher.
+      Hits on soft 17.
+      """
       while True:
           value = self.calculate_hand_value(self.dealer_hand)[0]
           soft17 = value == 17 and any(rank == 'A' for rank, _ in self.dealer_hand)
@@ -92,8 +138,11 @@ class BlackjackEnviron:
           else:
               break
 
-    # returns amount won/lost
     def check_winner(self):
+        """
+        Determines the winner of the round and calculates amount won/lost.
+        Returns: outcome message, payout amount.
+        """
         player_value = self.calculate_hand_value(self.player_hand)[0]
         dealer_value = self.calculate_hand_value(self.dealer_hand)[0]
 
@@ -117,6 +166,12 @@ class BlackjackEnviron:
         
     # currenly only supports hit or stand
     def step(self, action):
+      """
+      Takes an action ('hit' or 'stand') and updates the game state.
+      Args: 
+        action: action to take ('hit' or 'stand') at a certain state
+      Returns: tuple of (new state, reward, gameover status).
+      """
       if action == "hit":
           self.player_hand.append(self.deal_card())
           player_total, _ = self.calculate_hand_value(self.player_hand)
