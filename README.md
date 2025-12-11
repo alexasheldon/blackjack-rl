@@ -1,6 +1,8 @@
 # Blackjack Reinforcement Q-Learning Agent
-### Alexa Sheldon
-### BIONB 3500 Final Project
+**BIONB 3500 Final Project**
+
+**Author: Alexa Sheldon**
+
 This project implements a reinforcement learning agent to play Blackjack. Leveraging Q-learning, the agent seeks to understand a possible optimal strategy for playing the game.
 
 ## Features
