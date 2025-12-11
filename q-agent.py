@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 def main():
+    """
+    Main function to train and evaluate the Q-learning agent playing Blackjack.
+    """
     alpha = 0.08 # learning rate
     gamma = 0.95 # discount factor
     epsilon = 1.0 # exploration rate (decays over time)
@@ -17,6 +20,25 @@ def main():
     plot_evolution(checkpoint_Qs, checkpoint_episodes, ncols=3, save_prefix='policy_evo')
 
 def train(alpha=0.1, gamma=0.9, epsilon=1.0, episodes=50000, bankroll=100):
+    """
+    Trains a Q-learning agent to play Blackjack.
+    
+    Args:
+        alpha: Learning rate for Q-learning updates.
+        gamma: Discount factor for future rewards.
+        epsilon: Initial exploration rate for epsilon-greedy action selection.
+        episodes: Number of training episodes.
+        bankroll: Initial amount of money/chips to work with.
+    Returns:
+        Q: Learned Q-table mapping states to action values.
+        state_visits: Dictionary tracking number of visits to each state.
+        diffs: List of episode counts between bankroll replenishments.
+        win_amt: Total number of winning rounds.
+        total_return: Total reward accumulated over training.
+        accuracies: List of accuracy measurements over time.
+        checkpoint_Qs: List of Q-tables at various checkpoints.
+        checkpoint_episodes: List of episode numbers corresponding to checkpoints.
+    """
     # create Q-table
     Q = {}
     environment = blackjack_environ.BlackjackEnviron(start_bankroll=bankroll)
@@ -101,8 +123,12 @@ def train(alpha=0.1, gamma=0.9, epsilon=1.0, episodes=50000, bankroll=100):
 
     return Q, state_visits, diffs, win_amt, total_return, accuracies, checkpoint_Qs, checkpoint_episodes
 
-# comparing against random choice
+# useful for testing and comparison
 def random_agent():
+    """
+    Institutes a random action agent playing Blackjack for comparison.
+    Returns: diffs: a list of episode amts between bankroll replenishments.
+    """
     environment = blackjack_environ.BlackjackEnviron()
     diffs_rand = []
     prev_rand = 0
@@ -139,8 +165,16 @@ def random_agent():
             prev_rand = now_rand
     return diffs_rand
 
-# returns 'hit' or 'stand' based on basic blackjack strategy
 def basic_strategy_action(player_sum, dealer_upcard, usable_ace):
+    """
+    Returns decision on action based on basic blackjack strategy.
+    
+    Args:
+        player_sum: sum of player's hand values.
+        dealer_upcard: the value shown on dealer's upcard.
+        usable_ace: flag indicating if player has a usable ace.
+    Returns: action: a string 'hit' or 'stand'.
+    """
     # Hard totals
     if not usable_ace:
         if player_sum >= 17:
@@ -169,12 +203,28 @@ def basic_strategy_action(player_sum, dealer_upcard, usable_ace):
         # soft 17 or less: hit
         return 'hit'
 
-# standarizes state format for keys in Q table
 def make_state_key(state):
+    """
+    Standarizes state format for state keys in Q table
+    
+    Args:
+        state: tuple representing the game state.
+    Returns: standardized state key in the format (player total, dealer upcard, usable ace).
+    """
     return (state[0], state[1], state[2])  # player total, dealer upcard, usable ace
 
-# with epsilon at 0 and no learning, we check how often the agent wins
 def check_accuracy(Q, accuracies,episodes=1000, bankroll=100):
+    """
+    With epsilon at 0 and no learning, we check how often the agent wins. 
+    Using max Q-values for action selection.
+    
+    Args:
+        Q: Q-table mapping states to action values.
+        accuracies: list to append accuracy results of this function to.
+        episodes: batch number of episodes to test for accuracy.
+        bankroll: bankroll to use for simulation.
+    Returns: accuracy over the specified number of episodes.
+    """
     environment_test = blackjack_environ.BlackjackEnviron(start_bankroll=bankroll)
     correct = 0
     bet = 1
@@ -185,14 +235,13 @@ def check_accuracy(Q, accuracies,episodes=1000, bankroll=100):
         while not done:
             if state in Q:
                 action = max(Q[state], key=Q[state].get)
-                #print("Action chosen: ", action)
             else:
                 action = np.random.choice(environment_test.actions)
             next_state, reward, done = environment_test.step(action)
             state = next_state
         if reward > 0:
             correct += 1
-        # replenish bankroll for testing purposes
+        # replenish bankroll
         if environment_test.bankroll <= 10:
             environment_test.bankroll += 100
     accuracy = correct / episodes
@@ -200,13 +249,18 @@ def check_accuracy(Q, accuracies,episodes=1000, bankroll=100):
     print(f"Accuracy over {episodes} episodes: {accuracy}")
     return accuracy
 
-# returns win rate and average return per hand
 def eval(win_amt, total_return, episodes):
+    """
+    Prints win rate and average return per hand.
+    """
     print("Win rate: ", win_amt / episodes)
     print("Average return per hand: ", total_return / episodes)
 
-# Plotting how long it takes for a bankroll replenishment over episodes
+
 def eval_replenish(diffs, diffs_rand=None):
+    """
+    Plots how long it takes for a bankroll replenishment over episodes.
+    """
     plt.plot(range(len(diffs)), np.array(diffs), label='Q-Agent')
     if diffs_rand:
         plt.plot(range(len(diffs)), np.array(diffs_rand[:len(diffs)]), label='Random Agent')
@@ -215,9 +269,12 @@ def eval_replenish(diffs, diffs_rand=None):
     plt.title('Episodes Since Last Replenishment (Blackjack)')
     plt.show()
 
-# a plot of accuracy over time (evaluated on epsilon = 0 every some amount of episodes)
 def eval_accuracy(accuracies, accuracies_rand=None, episodes=1000):
-    # Plotting accuracy every 1000 episodes
+    """
+    Plots accuracy over time for the Q-learning agent and optionally the random agent.
+    Evaluated on epsilon = 0, every batch amount of episodes.
+    """
+    # Plotting accuracy every 1000 episodes by default
     plt.plot(range(len(accuracies)), np.array(accuracies), label='Q-Agent')
     if accuracies_rand:
         plt.plot(range(len(accuracies_rand)), np.array(accuracies_rand), label='Random Agent')
@@ -226,8 +283,10 @@ def eval_accuracy(accuracies, accuracies_rand=None, episodes=1000):
     plt.title('Accuracy (Blackjack)')
     plt.show()
 
-# a similar printout of q table strategy for analysis
 def understanding_q(Q, state_visits):
+    """
+    Simply prints out the learned strategy from the Q-table for analysis.
+    """
     strategy = {}
     for state, actions in sorted(Q.items()):
         # Choose the action with the highest Q-value for each state
@@ -235,14 +294,18 @@ def understanding_q(Q, state_visits):
         strategy[state] = optimal_action
         print(f"State {state}: {optimal_action} with Q-values {actions}, visited {state_visits.get(state)} times")
 
-# useful for determining how much exploration is needed
 def analyze_state_visits(state_visits):
+    """
+    Useful for determining how much exploration is needed by printing underexplored states.
+    """
     for state, count in state_visits.items():
         if count < 50:
             print(f"Underexplored state: {state} with {count} visits")
 
-# takes in Q-table and converts to grids for plotting
 def q_to_grids(Q, actions=None):
+    """
+    Converts Q-table into grid format for plotting & visualization.
+    """
     if actions is None:
         actions = ['hit', 'stand']
     # rows = player total, cols = dealer upcard
@@ -259,7 +322,7 @@ def q_to_grids(Q, actions=None):
     covered_soft = np.zeros_like(pref_soft, dtype=bool)
 
     # iterate over possible num_cards values that might exist in Q
-    # we aggregate by taking the most visited or the max-value across num_cards
+    # aggregate by taking the most visited or the max-value across num_cards
     for i, p in enumerate(player_range):
         for j, d in enumerate(dealer_range):
             hit_vals_hard = []
@@ -268,6 +331,7 @@ def q_to_grids(Q, actions=None):
             stand_vals_soft = []
 
             for key, action_dict in Q.items():
+                # looking for correct format
                 try:
                     key_player, key_dealer, key_usable = key
                 except Exception:
@@ -289,7 +353,6 @@ def q_to_grids(Q, actions=None):
                 qdiff_hard[i, j] = avg_hit - avg_stand
                 pref_hard[i, j] = 1 if avg_hit > avg_stand else 0
                 covered_hard[i, j] = True
-
             if hit_vals_soft:
                 avg_hit = np.mean(hit_vals_soft)
                 avg_stand = np.mean(stand_vals_soft)
@@ -308,8 +371,10 @@ def q_to_grids(Q, actions=None):
         'covered_soft': covered_soft
     }
 
-# plot the heatmap for a given grid
 def plot_heatmap(grid, player_range, dealer_range, title, cmap='RdBu_r', vmin=None, vmax=None, mask=None, ax=None, annot=False):
+    """
+    Plots the heatmap for a given grid.
+    """
     if ax is None:
         fig, ax = plt.subplots(figsize=(8, 6))
     # rows correspond to player totals, highest player total at top
@@ -322,13 +387,15 @@ def plot_heatmap(grid, player_range, dealer_range, title, cmap='RdBu_r', vmin=No
     ax.set_title(title)
     return ax
 
-# Check policy against basic strategy and plot results
 def plot_policy_and_agreement(Q, title_suffix='', savepath=None):
+    """
+    Checks policy from Q table against basic strategy and plot results.
+    """
     grids = q_to_grids(Q)
     pr = grids['player_range']
     dr = grids['dealer_range']
 
-    # preference heatmaps: 1=hit, 0=stand
+    # preference heatmaps: 1 = hit, 0 = stand
     pref_hard = grids['pref_hard']
     pref_soft = grids['pref_soft']
     covered_hard = grids['covered_hard']
@@ -367,7 +434,7 @@ def plot_policy_and_agreement(Q, title_suffix='', savepath=None):
         plt.savefig(savepath, dpi=200)
     plt.show()
 
-    # summary stats
+    # summary stats (accounting for NaNs)
     hard_cov_frac = np.nanmean(covered_hard)
     soft_cov_frac = np.nanmean(covered_soft)
     hard_agree = np.nanmean(agree_hard)
@@ -382,8 +449,10 @@ def plot_policy_and_agreement(Q, title_suffix='', savepath=None):
         'agreement_soft': soft_agree
     }
 
-# plot across checkpoints given list of Qs
 def plot_evolution(checkpoint_Qs, episodes, ncols=3, save_prefix=None):
+    """
+    Plots across checkpoints given list of Qs into saved figures if given save_prefix.
+    """
     n = len(checkpoint_Qs)
     nrows = int(np.ceil(n / ncols))
     fig, axes = plt.subplots(nrows*2, ncols, figsize=(4*ncols, 3*nrows*2))

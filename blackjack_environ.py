@@ -169,7 +169,7 @@ class BlackjackEnviron:
       """
       Takes an action ('hit' or 'stand') and updates the game state.
       Args: 
-        action: action to take ('hit' or 'stand') at a certain state
+        action: action to take ('hit' or 'stand') at a certain state.
       Returns: tuple of (new state, reward, gameover status).
       """
       if action == "hit":
