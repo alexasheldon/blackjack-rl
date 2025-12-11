@@ -40,9 +40,9 @@ This program has outputs within the terminal to keep track of progress, and it c
 - **Final Policy Heatmaps**: `policy_final.png`
 - **Policy Evolution Snapshots**: `policy_evo_snapshot_19.png` (showing all 20 checkpoints)
 
-## Visualizations
+## Visualizations / Technical Blog
 ### Final Policy Heatmap
-The final policy heatmap shows the agent's learned strategy for both hard and soft hands. The heatmap indicates whether the agent prefers to "hit" or "stand" in different game states. It also shows a comparison between the policy it lands on and the knowon strategy of Blackjack
+The final policy heatmap shows the agent's learned strategy for both hard and soft hands. The heatmap indicates whether the agent prefers to "hit" or "stand" in different game states. It also shows a comparison between the policy it lands on and the knowon strategy of Blackjack.
 
 ![Final Policy Heatmap](policy_final.png)
 
