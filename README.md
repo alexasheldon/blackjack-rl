@@ -72,7 +72,7 @@ Average return per hand:  -0.07441
 Coverage hard: 0.909, soft: 0.535
 Agreement hard: 0.906, soft: 0.790
 ```
-which indicates that overall, my agent won 41.3% of the time out of 50,000 episodes and the average return on a bet of 1 was -0.07. This means that on average, it lost 7 cents per round. The typical win percentage of someone playing the basic strategy is estimated to be around 42-45% (different sources provide varying answers, likely due to slight difference in environment, but most are within this range), and that includes having the option to use Double/Split/Insurance. 
+which indicates that overall, my agent won 41.3% of the time out of 50,000 episodes and the average return on a bet of 1 was -0.07. This means that on average, it lost 7 cents per round. The typical win percentage of someone playing the basic strategy is estimated to be around 48-49.5% (different sources provide varying answers, likely due to slight difference in environment, but most are within this range), and that includes having the option to use Double/Split/Insurance. 
 
 Coverage shows the proportion of states that were explored, and agreement is the proportion of covered states that have the same policy as the basic strategy. Here we had high coverage and agreement for hard, while having lower coverage (due to valuation method likely, see note below) and lower agreement. It is a bit rarer to see soft hands since they require drawing an Ace and not making use of, which makes sense that it may not be as congruent with basic strategy in those. 
 
