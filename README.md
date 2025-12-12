@@ -11,6 +11,8 @@ This project implements a reinforcement learning agent to play Blackjack. Levera
 - **Basic Strategy Comparison**: Contains functionality to compares the Q-learning agent's performance against a basic Blackjack strategy.
 - **Visualization**: Generates heatmaps to visualize the learned policy and its agreement with the basic strategy.
 
+Note: since there is randomness to how each game is played (what cards are dealt and epsilon-greedy action selection), each time it is run, it will look slightly different and perform slightly differently. The visualizations shown are the most recent ran and pushed to the Github Repo. 
+
 ## Setup Instructions
 ### 1. Clone the repository
 ```bash
@@ -57,14 +59,14 @@ python snaps_to_gifs.py
 
 ## Visualizations / Technical Blog
 ### Final Policy Heatmap
-The final policy heatmap shows the agent's learned strategy for both hard and soft hands. The heatmap indicates whether the agent prefers to "hit" or "stand" in different game states. It also shows a comparison between the policy it lands on and the knowon strategy of Blackjack.
+The final policy heatmap shows the agent's learned strategy for both hard and soft hands. The heatmap indicates whether the agent prefers to "hit" or "stand" in different game states. It also shows a comparison between the policy it lands on and the known strategy of Blackjack.
 
 ![Final Policy Heatmap](policy_final.png)
 
 ### Basic Strategy Heatmap for Comparison
 ![Basic Strategy Heatmap](basic_strategy.png)
 
-### Agenet's Policy Evolution
+### Agent's Policy Evolution
 The evolution of the policy over training episodes is visualized in a series of snapshots in the below gif and then the grid. These snapshots show how the agent's strategy change over time.
 
 Change in Difference of Q-values over time:
@@ -76,6 +78,10 @@ Change in Policy over time:
 Final snapshot:
 ![Policy Evolution Snapshot](policy_evo_snapshot_19.png)
 
+### Accuracy
+Evaluating Accuracy (win rate) every 2500 episodes, shows a flucation (likely due to sheer randomness) in the accuracy rate over episodes.
+![Accuracy over Episodes Graph](accuracy.png)
+
 ### Blackjack Environment
 The `blackjack_environ.py` file defines the Blackjack environment, including the rules of the game, actions, and rewards. As it currently stands, players can only hit and stand, though it has room to expand the state space to include Double/Split/Insurance later on. However, the dealer strategy and the shoe are built to resemble a casino environment.
 
@@ -84,10 +90,9 @@ The `blackjack_environ.py` file defines the Blackjack environment, including the
 - **Average Return**: The average reward per hand.
 - **Policy Agreement**: The percentage of states where the learned policy matches the basic strategy.
 
-
 ## Acknowledgments
 - The Blackjack environment was custom-built for this project.
-- The project uses `matplotlib` and `seaborn` for data visualization.
-- This project was developed with teaching from Copilot.
+- The project uses `matplotlib`, `seaborn`, and `Pillow` for data visualization.
+- This project was developed with teaching/assistance from Copilot.
 
 ---

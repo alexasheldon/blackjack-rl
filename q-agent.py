@@ -523,8 +523,8 @@ def plot_evolution(checkpoint_Qs, episodes, ncols=3, save_prefix=None):
         diffs_fig, diffs_axes = plt.subplots(2, 1, figsize=(6, 8))
         ax_h, ax_s = diffs_axes
 
-        plot_heatmap(grids['qdiff_hard'], pr, dr, f'Q_hit - Q_stand Hard', mask=~grids['covered_hard'], ax=ax_h, cmap='RdBu_r', vmin=-2, vmax=2)
-        plot_heatmap(grids['qdiff_soft'], pr, dr, f'Q_hit - Q_stand Soft', mask=~grids['covered_soft'], ax=ax_s, cmap='RdBu_r', vmin=-2, vmax=2)
+        plot_heatmap(grids['qdiff_hard'], pr, dr, f'Q_hit - Q_stand Hard {title}', mask=~grids['covered_hard'], ax=ax_h, cmap='RdBu_r', vmin=-2, vmax=2)
+        plot_heatmap(grids['qdiff_soft'], pr, dr, f'Q_hit - Q_stand Soft {title}', mask=~grids['covered_soft'], ax=ax_s, cmap='RdBu_r', vmin=-2, vmax=2)
 
         diffs_fig.tight_layout()
         diffs_fig.savefig(f"diff_heatmap_snaps/episode_{int(epi):04d}_hard_soft.png", dpi=200, bbox_inches='tight', pad_inches=0.02)
