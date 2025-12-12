@@ -15,7 +15,7 @@ def main():
     Q, state_visits, diffs, win_amt, total_return, accuracies, checkpoint_Qs, checkpoint_episodes = train(alpha, gamma, epsilon, episodes, bankroll)
     #understanding_q(Q, state_visits)
     eval(win_amt, total_return, episodes)
-    #eval_accuracy(accuracies, episodes=2500)
+    eval_accuracy(accuracies, episodes=2500, save=True)
     plot_policy_and_agreement(Q, title_suffix='final', savepath='policy_final.png')
     plot_evolution(checkpoint_Qs, checkpoint_episodes, ncols=3, save_prefix='policy_evo')
 
@@ -54,7 +54,8 @@ def train(alpha=0.1, gamma=0.9, epsilon=1.0, episodes=50000, bankroll=100):
     for epi in range(episodes):
         # check accuracy every 2500 episodes
         if (epi+1) % 2500 == 0:
-            print("Checking accuracy at episode ", epi+1)
+            # Can uncomment for logging
+            # print("Checking accuracy at episode ", epi+1)
             check_accuracy(Q, accuracies, episodes=2500, bankroll=environment.bankroll)
             checkpoint_Qs.append({k: v.copy() for k, v in Q.items()})
             checkpoint_episodes.append(epi+1)
@@ -102,10 +103,10 @@ def train(alpha=0.1, gamma=0.9, epsilon=1.0, episodes=50000, bankroll=100):
         win_amt += 1 if total_reward > 0 else 0
         total_return += total_reward
 
-        player_total, _ = environment.calculate_hand_value(environment.player_hand)
-        dealer_total, _ = environment.calculate_hand_value(environment.dealer_hand)
-        if (epi + 1) % 900 == 0:
-            print(f"Episode {epi+1} ended. Player total: {player_total}, Dealer total: {dealer_total}, Reward: {total_reward}")
+        # Can uncomment for detailed episode logs
+        # player_total, _ = environment.calculate_hand_value(environment.player_hand)
+        # dealer_total, _ = environment.calculate_hand_value(environment.dealer_hand)
+        # print(f"Episode {epi+1} ended. Player total: {player_total}, Dealer total: {dealer_total}, Reward: {total_reward}")
 
         # Phased decay epsilon
         if epi <= .1*episodes:
@@ -135,8 +136,8 @@ def random_agent():
     episodes = 50000 # number of training episodes
 
     for epi in range(episodes):
-        
-        print(f"Episode {epi + 1}, Bankroll: {environment.bankroll}, Random Agent")
+        # Can uncomment for detailed episode logs
+        # print(f"Episode {epi + 1}, Bankroll: {environment.bankroll}, Random Agent")
 
         bet = 1 # standard bet
         environment.place_bet(bet)
@@ -246,7 +247,8 @@ def check_accuracy(Q, accuracies,episodes=1000, bankroll=100):
             environment_test.bankroll += 100
     accuracy = correct / episodes
     accuracies.append(accuracy)
-    print(f"Accuracy over {episodes} episodes: {accuracy}")
+    # Can uncomment for logging
+    # print(f"Accuracy over {episodes} episodes: {accuracy}")
     return accuracy
 
 def eval(win_amt, total_return, episodes):
@@ -269,7 +271,7 @@ def eval_replenish(diffs, diffs_rand=None):
     plt.title('Episodes Since Last Replenishment (Blackjack)')
     plt.show()
 
-def eval_accuracy(accuracies, accuracies_rand=None, episodes=1000):
+def eval_accuracy(accuracies, accuracies_rand=None, episodes=1000, save=False):
     """
     Plots accuracy over time for the Q-learning agent and optionally the random agent.
     Evaluated on epsilon = 0, every batch amount of episodes.
@@ -281,7 +283,10 @@ def eval_accuracy(accuracies, accuracies_rand=None, episodes=1000):
     plt.xlabel(f'Trial (every {episodes} episodes)')
     plt.ylabel('Accuracy')
     plt.title('Accuracy (Blackjack)')
+    if save:
+        plt.savefig("accuracy.png", dpi=200)
     plt.show()
+    
 
 def understanding_q(Q, state_visits):
     """
@@ -387,6 +392,36 @@ def plot_heatmap(grid, player_range, dealer_range, title, cmap='RdBu_r', vmin=No
     ax.set_title(title)
     return ax
 
+def plot_basic_strategy(title_suffix='', savepath=None):
+    """
+    Plots the basic strategy for blackjack.
+    """
+    pr = list(range(4, 22))
+    dr = list(range(2, 12))
+
+    # Basic strategy: 1 = hit, 0 = stand
+    basic_strategy_hard = np.full((len(pr), len(dr)), np.nan)
+    basic_strategy_soft = np.full((len(pr), len(dr)), np.nan)
+
+    for i, p in enumerate(pr):
+        for j, d in enumerate(dr):
+            action = basic_strategy_action(p, d, False)
+            basic_strategy_hard[i, j] = 1 if action == 'hit' else 0
+
+            action = basic_strategy_action(p, d, True)
+            basic_strategy_soft[i, j] = 1 if action == 'hit' else 0
+
+    # Plotting
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    
+    plot_heatmap(basic_strategy_hard, pr, dr, f'Basic Strategy Hard {title_suffix}', cmap='coolwarm', vmin=0, vmax=1, ax=axes[0])
+    plot_heatmap(basic_strategy_soft, pr, dr, f'Basic Strategy Soft {title_suffix}', cmap='coolwarm', vmin=0, vmax=1, ax=axes[1])
+
+    plt.tight_layout()
+    if savepath:
+        plt.savefig(savepath)
+    plt.show()
+
 def plot_policy_and_agreement(Q, title_suffix='', savepath=None):
     """
     Checks policy from Q table against basic strategy and plot results.
@@ -464,6 +499,8 @@ def plot_evolution(checkpoint_Qs, episodes, ncols=3, save_prefix=None):
         grids = q_to_grids(Qsnap)
         pr = grids['player_range']
         dr = grids['dealer_range']
+
+        # Place into grid axes
         # policy for hard
         ax1 = axes[row, col]
         plot_heatmap(grids['pref_hard'], pr, dr, f'Hard Policy {title}', mask=~grids['covered_hard'], ax=ax1, cmap='coolwarm', vmin=0, vmax=1)
@@ -471,10 +508,31 @@ def plot_evolution(checkpoint_Qs, episodes, ncols=3, save_prefix=None):
         ax2 = axes[row+1, col]
         plot_heatmap(grids['pref_soft'], pr, dr, f'Soft Policy {title}', mask=~grids['covered_soft'], ax=ax2, cmap='coolwarm', vmin=0, vmax=1)
 
-    if save_prefix:
-        plt.savefig(f"{save_prefix}_snapshot_{idx}.png", dpi=200)
+        # individual heat maps (policy)
+        pair_fig, pair_axes = plt.subplots(2, 1, figsize=(6, 8))
+        ax_h, ax_s = pair_axes
+
+        plot_heatmap(grids['pref_hard'], pr, dr, f'Hard Policy {title}', mask=~grids['covered_hard'], ax=ax_h, cmap='coolwarm', vmin=0, vmax=1)
+        plot_heatmap(grids['pref_soft'], pr, dr, f'Soft Policy {title}', mask=~grids['covered_soft'], ax=ax_s, cmap='coolwarm', vmin=0, vmax=1)
+
+        pair_fig.tight_layout()
+        pair_fig.savefig(f"evolution_snaps/episode_{int(epi):04d}_hard_soft.png", dpi=200, bbox_inches='tight', pad_inches=0.02)
+        plt.close(pair_fig)
+
+        # individual heat maps (diffs)
+        diffs_fig, diffs_axes = plt.subplots(2, 1, figsize=(6, 8))
+        ax_h, ax_s = diffs_axes
+
+        plot_heatmap(grids['qdiff_hard'], pr, dr, f'Q_hit - Q_stand Hard', mask=~grids['covered_hard'], ax=ax_h, cmap='RdBu_r', vmin=-2, vmax=2)
+        plot_heatmap(grids['qdiff_soft'], pr, dr, f'Q_hit - Q_stand Soft', mask=~grids['covered_soft'], ax=ax_s, cmap='RdBu_r', vmin=-2, vmax=2)
+
+        diffs_fig.tight_layout()
+        diffs_fig.savefig(f"diff_heatmap_snaps/episode_{int(epi):04d}_hard_soft.png", dpi=200, bbox_inches='tight', pad_inches=0.02)
+        plt.close(diffs_fig)
 
     plt.tight_layout()
+    if save_prefix:
+        plt.savefig(f"{save_prefix}_snapshot_{idx}.png", dpi=200)
     plt.show()
 
 if __name__ == "__main__":
