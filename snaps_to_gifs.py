@@ -1,5 +1,6 @@
 from PIL import Image
 import glob
+import os
 
 def create_gif_from_pngs(output_filename, png_dir, duration=100, loop=0):
     """
@@ -12,6 +13,7 @@ def create_gif_from_pngs(output_filename, png_dir, duration=100, loop=0):
       loop: Number of loops for the GIF (0 means infinite).
     """
     files = glob.glob(f"{png_dir}/*.png")
+    files = sorted(files, key=lambda f: int(os.path.basename(f).split("_")[1])) # order by episode number
 
     if not files:
         print("No PNG files found in the specified directory.")
