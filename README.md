@@ -58,7 +58,7 @@ python snaps_to_gifs.py
 ```
 
 ### Blackjack Environment
-The `blackjack_environ.py` file defines the Blackjack environment, including the rules of the game, actions, and rewards. As it currently stands, players can only *hit* and *stand*, though it has room to expand the state space to include Double/Split/Insurance later on. However, the dealer strategy and the shoe are built to resemble a casino environment.
+The `blackjack_environ.py` file defines the Blackjack environment, including the rules of the game, actions, and rewards. As it currently stands, players can only *hit* and *stand*, though it has room to expand the state space to include Double/Split/Insurance later on. However, the dealer strategy and the shoe are built to resemble a casino environment. To solidy the rules of the game, I used [this guide](https://bicyclecards.com/how-to-play/blackjack "Bicycle Cards: How to Play Blackjack") from Bicycle Cards.
 
 ## Evaluation Metrics
 - **Win Rate**: The percentage of games won by the agent.
