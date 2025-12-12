@@ -72,15 +72,15 @@ Average return per hand:  -0.07441
 Coverage hard: 0.909, soft: 0.535
 Agreement hard: 0.906, soft: 0.790
 ```
-which indicates that overall, my agent won 41.3% of the time out of 50,000 episodes and the average return on a bet of 1 was -0.07. This means that on average, it lost 7 cents per round, which is not bad by any means. The typical win percentage of someone playing the basic strategy is estimated to be around 42-45% (different sources provide varying answers, likely due to slight difference in environment, but most are within this range), and that includes having the option to use Double/Split/Insurance. 
+which indicates that overall, my agent won 41.3% of the time out of 50,000 episodes and the average return on a bet of 1 was -0.07. This means that on average, it lost 7 cents per round. The typical win percentage of someone playing the basic strategy is estimated to be around 42-45% (different sources provide varying answers, likely due to slight difference in environment, but most are within this range), and that includes having the option to use Double/Split/Insurance. 
 
-Coverage shows the proportion of states that were explored, and agreement is the proportion of covered states that have the same policy as the basic strategy. 
+Coverage shows the proportion of states that were explored, and agreement is the proportion of covered states that have the same policy as the basic strategy. Here we had high coverage and agreement for hard, while having lower coverage (due to valuation method likely, see note below) and lower agreement. It is a bit rarer to see soft hands since they require drawing an Ace and not making use of, which makes sense that it may not be as congruent with basic strategy in those. 
 
 ## Visualizations / Technical Blog
 ### Final Policy Heatmap
 The final policy heatmap shows the agent's learned strategy for both hard and soft hands. The heatmap indicates whether the agent prefers to "hit" or "stand" in different game states. It also shows a comparison between the policy it lands on and the known strategy of Blackjack.
 
-*Something to note is that the nature of the environment created means that we will only explore soft values between 12 and 14 (inclusive) when running the Q-agent. This is due to how scoring/valuation is handled with the aces.*
+*Note: The nature of the environment created means that we will only explore soft values between 12 and 14 (inclusive) when running the Q-agent. This is due to how scoring/valuation is handled with the aces.*
 
 ![Final Policy Heatmap](policy_final.png)
 
@@ -88,9 +88,10 @@ The final policy heatmap shows the agent's learned strategy for both hard and so
 ![Basic Strategy Heatmap](basic_strategy.png)
 
 ### Agent's Policy Evolution
-The evolution of the policy over training episodes is visualized in a series of snapshots (every 2500 episodes) in the below gif and then the grid. These snapshots show how the agent's strategy change over time. Notice how the squares get darker over time as they converge to a strategy, though some remain light due to the ambiguity of a correct decision to make.
+The evolution of the policy over training episodes is visualized in a series of snapshots (every 2500 episodes) in the below gif and then the grid. These snapshots show how the agent's strategy change over time. 
 
 Change in Difference of Q-values over time:
+Notice how the squares get darker over time as they converge to a strategy, though some remain light due to the ambiguity of a correct decision to make.
 ![Difference of Q-values Evolution GIF](qdiffs.gif)
 
 Change in Policy over time:
@@ -100,14 +101,14 @@ Final snapshot (all 20 in a grid):
 ![Policy Evolution Snapshot](policy_evo_snapshot_19.png)
 
 ### Accuracy
-Evaluating Accuracy (win rate) every 2500 episodes, shows a flucation (likely due to sheer randomness) in the accuracy rate over episodes. THough notice that accuracy stays mostly in the 41% to 44% range. Each time this q-agent is run, the accuracy stays around that range over time.
+Evaluating Accuracy (win rate) every 2500 episodes, shows a flucation (likely due to randomness) in the accuracy rate over episodes. Though notice that accuracy stays mostly in the 41% to 44% range. Each time this q-agent is run, the accuracy stays around that range over time.
 ![Accuracy over Episodes Graph](accuracy.png)
 
 ### Other Visualization Functionality
 #### Episodes Since Last Replenishment
 This metric was used early on and still remains in the code if you would like to use it. Essentially, a player is given a bankroll of 100 and constantly bets 1. If the model is winning, it will take longer to deplete its bankroll. Consequently, this graph measures the number of episodes before they need to increase their funds again (hitting 10 or less remaining). 
 #### Random Agent
-Currently commented out, we have a random agent that can play as well for comparison. Notably, there's integration of random agent on graphs like the Episodes Since Last Replenishment.
+Currently not being used in `main`, we have a random agent that can play as well for comparison. Notably, there's functionality for integration of random agent on graphs like the 'Episodes Since Last Replenishment'.
 
 ## Acknowledgments
 - The Blackjack environment was custom-built for this project.
