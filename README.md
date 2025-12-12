@@ -38,11 +38,22 @@ pip install -r requirements.txt
 
 ### 4. Run the Code
 You are now free to run `q-agent.py` however you choose to (including in terminal or via play button). 
+```bash
+python q-agent.py
+```
 
 ### 5. View Results
-This program has outputs within the terminal to keep track of progress, and it captures various heatmaps along the way of training. 
-- **Final Policy Heatmaps**: `policy_final.png`
+This program has logged outputs within the terminal to keep track of progress that you may uncomment if you choose to, and it captures various heatmaps along the way of training. 
+- **Basic Strategy Heatmap**: `basic_strategy.png` (for comparison to policy found by Q-agent)
+- **Final Policy Heatmaps**: `policy_final.png` (latest policy found by Q-agent)
+- **Q-Diffs Evolution Snapshots**: `diff_heatmap_snaps/` (contains Q-diffs for all 20 checkpoints)
+- **Policy Evolution Snapshots**: `evolution_snaps/` (contains Q-diffs for all 20 checkpoints)
 - **Policy Evolution Snapshots**: `policy_evo_snapshot_19.png` (showing all 20 checkpoints)
+
+If you'd like to convert your snapshots to gifs, you can run `snaps_to_gifs.py` which leverages `Pillow`.
+```bash
+python snaps_to_gifs.py
+```
 
 ## Visualizations / Technical Blog
 ### Final Policy Heatmap
@@ -50,8 +61,17 @@ The final policy heatmap shows the agent's learned strategy for both hard and so
 
 ![Final Policy Heatmap](policy_final.png)
 
-### Policy Evolution
-The evolution of the policy over training episodes is visualized in a series of snapshots in the below grid. These snapshots show how the agent's strategy change over time.
+### Basic Strategy Heatmap for Comparison
+![Basic Strategy Heatmap](basic_strategy.png)
+
+### Agenet's Policy Evolution
+The evolution of the policy over training episodes is visualized in a series of snapshots in the below gif and then the grid. These snapshots show how the agent's strategy change over time.
+
+Change in Difference of Q-values over time:
+![Difference of Q-values Evolution GIF](qdiffs.gif)
+
+Change in Policy over time:
+![Policy Evolution GIF](evolution.gif)
 
 Final snapshot:
 ![Policy Evolution Snapshot](policy_evo_snapshot_19.png)
