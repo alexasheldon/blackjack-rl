@@ -49,7 +49,7 @@ This program has logged outputs within the terminal to keep track of progress th
 - **Basic Strategy Heatmap**: `basic_strategy.png` (for comparison to policy found by Q-agent)
 - **Final Policy Heatmaps**: `policy_final.png` (latest policy found by Q-agent)
 - **Q-Diffs Evolution Snapshots**: `diff_heatmap_snaps/` (contains Q-diffs for all 20 checkpoints)
-- **Policy Evolution Snapshots**: `evolution_snaps/` (contains Q-diffs for all 20 checkpoints)
+- **Policy Evolution Snapshots**: `evolution_snaps/` (contains policy (hit/stand for each state) for all 20 checkpoints)
 - **Policy Evolution Snapshots**: `policy_evo_snapshot_19.png` (showing all 20 checkpoints)
 
 If you'd like to convert your snapshots to gifs, you can run `snaps_to_gifs.py` which leverages `Pillow`.
@@ -67,7 +67,7 @@ The final policy heatmap shows the agent's learned strategy for both hard and so
 ![Basic Strategy Heatmap](basic_strategy.png)
 
 ### Agent's Policy Evolution
-The evolution of the policy over training episodes is visualized in a series of snapshots in the below gif and then the grid. These snapshots show how the agent's strategy change over time.
+The evolution of the policy over training episodes is visualized in a series of snapshots (every 2500 episodes) in the below gif and then the grid. These snapshots show how the agent's strategy change over time.
 
 Change in Difference of Q-values over time:
 ![Difference of Q-values Evolution GIF](qdiffs.gif)
